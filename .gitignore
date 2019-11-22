@@ -104,6 +104,6 @@ venv.bak/
 .mypy_cache/
 
 # Custom stuff
-sample-data/
-*.csv
+data/
+.*.csv
 src/*.csv
