@@ -1,11 +1,11 @@
 import csv
-import os
 import sys
 import argparse
 import logging
 import time
+from pathlib import Path
 
-DATA_FOLDER = os.getcwd() + "/../data"
+DATA_FOLDER = Path("../data/")
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
@@ -66,7 +66,25 @@ def write_csv(contents, output):
     for item in contents:
         writer.writerow(item)
 
-def main(file1=None, file2=None, file3=None, outfile=None):
+def main(file1=None, file2=None, file3=None):
+    # We would like to ensure that output file is always
+    # "../data" directory to prevent accidental leakage
+    if args.outfile:
+        output_name = args.outfile.name
+        if not Path(output_name).is_absolute():
+            file_name = output_name.split("/")[-1]
+            output_fd = open(DATA_FOLDER.resolve() / file_name, 'w', encoding='utf-8-sig')
+        else:
+            # Remove the leading slash
+            file_path = str(Path(output_name).parent).lstrip("/")
+            file_name = output_name.split("/")[-1]
+            if not Path(file_path).exists():
+                Path(DATA_FOLDER.resolve() / file_path).mkdir(parents=True, exist_ok=True)
+            output_fd = open(DATA_FOLDER.resolve() / file_path / file_name, 'w', encoding='utf-8-sig')
+        print(output_fd.name)
+    else:
+        output_fd = sys.stdout
+
     logging.info("Reading CSV files...")
     active_employees = read_csv(file1)
     new_hires = read_csv(file2)
@@ -91,7 +109,7 @@ def main(file1=None, file2=None, file3=None, outfile=None):
     time.sleep(1)
     # STEP 5: Write the contents to a new CSV file.
     logging.info("Outputting the final data set...")
-    write_csv(final_list, outfile)
+    write_csv(final_list, output_fd)
     time.sleep(1)
     logging.info("All done.")
 
@@ -99,11 +117,11 @@ def main(file1=None, file2=None, file3=None, outfile=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Optional argument
-    parser.add_argument('-o', '--outfile', nargs='?', type=argparse.FileType('w'), default=sys.stdout)
+    parser.add_argument('-o', '--outfile', nargs='?', type=argparse.FileType('w', encoding='utf-8-sig'))
     required_arg_group = parser.add_argument_group('required arguments')
     required_arg_group.add_argument('-a', '--all-employees', nargs=1, type=argparse.FileType('r', encoding='utf-8-sig'), required=True)
     required_arg_group.add_argument('-n', '--new-hires', nargs=1, type=argparse.FileType('r', encoding='utf-8-sig'), required=True)
     required_arg_group.add_argument('-t', '--terminated', nargs=1, type=argparse.FileType('r', encoding='utf-8-sig'), required=True)
 
     args = parser.parse_args()
-    main(*args.all_employees, *args.new_hires, *args.terminated, args.outfile)
+    main(*args.all_employees, *args.new_hires, *args.terminated)
