@@ -117,7 +117,12 @@ def main(file1=None, file2=None, file3=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Optional argument
-    parser.add_argument('-o', '--outfile', nargs='?', type=argparse.FileType('w', encoding='utf-8-sig'))
+    parser.add_argument(
+        '-o', '--outfile', 
+        nargs='?', type=argparse.FileType('w', encoding='utf-8-sig'),
+        help='File to store the output. NOTE: The final file will always be stored under \
+            the "data" directory, in order to prevent accidental data leakage.'
+    )
     required_arg_group = parser.add_argument_group('required arguments')
     required_arg_group.add_argument('-a', '--all-employees', nargs=1, type=argparse.FileType('r', encoding='utf-8-sig'), required=True)
     required_arg_group.add_argument('-n', '--new-hires', nargs=1, type=argparse.FileType('r', encoding='utf-8-sig'), required=True)
