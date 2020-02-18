@@ -4,8 +4,10 @@ import argparse
 import logging
 import time
 from pathlib import Path
+import os
 
-DATA_FOLDER = Path("../data/")
+ROOT_FOLDER = Path(__file__ + "/..")
+DATA_FOLDER = Path(ROOT_FOLDER / ".." / "data")
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
@@ -118,7 +120,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Optional argument
     parser.add_argument(
-        '-o', '--outfile', 
+        '-o', '--outfile',
         nargs='?', type=argparse.FileType('w', encoding='utf-8-sig'),
         help='File to store the output. NOTE: The final file will always be stored under \
             the "data" directory, in order to prevent accidental data leakage.'

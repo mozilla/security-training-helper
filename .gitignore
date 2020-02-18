@@ -105,5 +105,7 @@ venv.bak/
 
 # Custom stuff
 data/
-.*.csv
+*.csv
 src/*.csv
+.DS_Store
+.vscode/
